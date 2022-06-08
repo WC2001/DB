@@ -1,0 +1,16 @@
+{
+  "name": "chess_db",
+  "version": "1.0.0",
+  "description": "App for DB class",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Wiktor Cieslikiewicz",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongodb": "^4.7.0",
+    "socket.io": "^4.5.1"
+  }
+}
