@@ -16,7 +16,7 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>|null>(null);
 
     useEffect(() => {
-        const newSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://localgithost:3001`);
+        const newSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`https://localgithost:3001`);
         setSocket(newSocket);
 
         return () => {

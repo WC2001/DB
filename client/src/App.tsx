@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './App.css';
 import io, {Socket} from 'socket.io-client';
 
-import { Home, About, Error } from './pages'
+import { Home, About, Error, Login } from './pages'
 
 import {
   BrowserRouter as Router,
@@ -18,10 +18,12 @@ import {Provider} from "./shared/providers";
 
 
 
+
 function App() {
   const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>|null>(null);
   const [ routes, setRoutes ] = useState<{path: string, element: JSX.Element}[]>([
       { path: '/about', element: <About /> },
+      { path: '/login', element:<Login />},
       { path: '/',      element: <Home /> },
       { path: '*',      element: <Error /> },
   ])

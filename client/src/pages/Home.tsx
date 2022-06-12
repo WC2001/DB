@@ -1,8 +1,12 @@
-import React, {useContext, useEffect} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {WebsocketState} from "../shared/providers";
+import {Board, FieldElement} from "../components";
+import {PieceEnum} from "../shared/types";
 
 interface HomeProps {
 }
+
+
 
 export const Home : React.FC<HomeProps> = ({}) => {
     const socket = useContext(WebsocketState);
@@ -16,7 +20,7 @@ export const Home : React.FC<HomeProps> = ({}) => {
 
     return (
         <main>
-            <h1> Login </h1>
+            <Board board={boardState}/>
         </main>
     )
 }

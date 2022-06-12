@@ -9,7 +9,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
         <nav>
             <div> <Link to="/"> Home </Link> </div>
             <div> <Link to="/about"> About </Link> </div>
-            <div> <Link to="/about"> Profle </Link> </div>
+            <div> <Link to="/login"> Log in </Link> </div>
             {/*<div> <Link to="/asdfe"> Error </Link> </div>*/}
         </nav>
     )
