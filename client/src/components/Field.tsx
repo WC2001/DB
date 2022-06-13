@@ -11,7 +11,7 @@ export const Field : React.FC<FieldProps> = ({piece, color}) => {
     return (
         <div className={'field'}>
             {
-                piece != PieceEnum.Empty && <FontAwesomeIcon icon={[ color==='white'? "far" : "fas", `chess-${piece}`]} />
+                // piece != PieceEnum.Empty && <FontAwesomeIcon icon={[ color==='white'? "far" : "fas", `chess-${piece}`]} />
             }
         </div>
     )

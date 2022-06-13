@@ -28,10 +28,10 @@ export const Board : React.FC<BoardProps> = ({}) => {
         <div className="board">
             {
                 boardState.map(
-                    row => (
-                        <div className="row">
+                    (row, rowID) => (
+                        <div key={rowID} className="row">
                             {
-                                row.map( field => ( <Field piece={field.piece} color={field.color} /> ))
+                                row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` } piece={field.piece} color={field.color} /> ))
                             }
                         </div>
                     )
