@@ -19,13 +19,6 @@ export const Login: React.FC<LoginProps> = () => {
                 onSubmit={ async (values, {setSubmitting})=> {
                     const payload: User = { username: values.username, password: values.password };
                     login(payload)
-                    // const res = await fetch( 'http://localhost:3000/', {
-                    //     method: 'POST',
-                    //     headers: {  'Content-Type': 'application/json' },
-                    //     body: JSON.stringify( payload )
-                    // });
-                    // const data  = await res.json();
-
                 } }>
                 {
                     ({ values, errors, touched, handleBlur, handleChange, handleSubmit })=>(

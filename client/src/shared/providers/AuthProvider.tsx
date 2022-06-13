@@ -18,18 +18,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
         <AuthState.Provider value={{
             user: user,
             login: async ( data: User )=> {
-                const res = await fetch( 'http://localhost:3000/', {
+                const res = await fetch( 'http://localhost:3000/user/login', {
                     method: 'POST',
                     headers: {  'Content-Type': 'application/json' },
                     body: JSON.stringify( data )
                 });
                 const json  = await res.json();
                 setUser(json);
-                // TODO: some session storage
             },
             logout: async () => {
                 setUser(null);
-                // TODO: some session storage
             }
         }}>
             { children }
