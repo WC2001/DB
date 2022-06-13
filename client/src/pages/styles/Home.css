@@ -25,11 +25,21 @@ main > .board > .row > .field {
     border: 3px #0000003d solid;
     grid-column: span 1;
     background: var(--field-color);
-    height: 100%;
+    width:  calc(100% - 0.2rem);
     margin: .1rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    font-size: 2rem;
 }
 main > .board > .row > .field:hover {
     background: var(--field-color);
     border: 3px rgb(55, 152, 76) solid;
 }
+main > .board > .row > .field.dark {
+    /*background: #f2eddf;*/
+    background: #9a7c6e;
+}
+main > .board > .row > .field > svg {box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;  }

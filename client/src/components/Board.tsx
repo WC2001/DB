@@ -31,7 +31,7 @@ export const Board : React.FC<BoardProps> = ({}) => {
                     (row, rowID) => (
                         <div key={rowID} className="row">
                             {
-                                row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` } piece={field.piece} color={field.color} /> ))
+                                row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` } piece={field.piece} color={field.color} blackField={ (rowID+colID)%2==0 } /> ))
                             }
                         </div>
                     )
