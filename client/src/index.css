@@ -3,6 +3,13 @@
 :root {
   --primary: rgb(179, 217, 232);
   --bg: rgba(243,243,243,1);
+  --field-color: #F5DEB3FF;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family:  'Roboto' , sans-serif;
 }
 
 body {
@@ -48,5 +55,4 @@ nav > div > a {
   text-decoration: none;
   color: #000;
 }
-
 

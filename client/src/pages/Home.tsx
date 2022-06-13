@@ -1,11 +1,10 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect} from "react";
+import './styles/Home.css'
 import {WebsocketState} from "../shared/providers";
-import {Board, FieldElement} from "../components";
-import {PieceEnum} from "../shared/types";
+import {Board} from "../components";
 
 interface HomeProps {
 }
-
 
 
 export const Home : React.FC<HomeProps> = ({}) => {
@@ -16,11 +15,11 @@ export const Home : React.FC<HomeProps> = ({}) => {
         socket?.emit("message", { message: 'xd' , game: 'xxx', player: 'xyz' })
         console.log(socket)
         console.log('xd')
-    },[] )
+    },[socket] )
 
     return (
         <main>
-            <Board board={boardState}/>
+            <Board />
         </main>
     )
 }

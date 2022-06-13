@@ -1,0 +1,25 @@
+
+.about {
+    width: 100%;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column nowrap;
+}
+
+.about > h1 {
+    font-size: 4vw;
+    color: var(--primary);
+    font-weight: 900;
+}
+.about > p {
+    margin-top: 2rem;
+    width: 80%;
+    padding: 3rem;
+    background: #0000003d;
+    border-radius: 15px;
+    font-weight: 200;
+    line-height: 2.5rem;
+    font-size: 1.5rem;
+}
