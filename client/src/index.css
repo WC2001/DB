@@ -4,6 +4,7 @@
   --primary: rgb(179, 217, 232);
   --bg: rgba(243,243,243,1);
   --field-color: #F5DEB3FF;
+  --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
 }
 * {
   margin: 0;

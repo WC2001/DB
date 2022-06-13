@@ -1,0 +1,64 @@
+main {
+    width: 100%;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column nowrap;
+    background: linear-gradient(45deg, rgba(243,243,243), var(--primary));
+}
+main > h1 {
+    font-size: 4vw;
+    color: var(--primary);
+    font-weight: 900;
+}
+
+main > form {
+    width: 70%;
+    padding: 5rem 3em;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+main > form > div{
+    width: 100%;
+    /*padding: 5rem 3em;*/
+    margin: 1rem;
+    display: flex;
+    flex-flow: column nowrap;
+    /*box-shadow: var(--shadow);*/
+}
+main > form > div > div { color: red }
+main > form > div > input {
+    height: 70px;
+    padding: 1rem 2rem;
+    border-radius: 45px;
+    border: none;
+    outline: none;
+    box-shadow: var(--shadow);
+    font-weight: 400;
+    font-family: 'Roboto' , sans-serif;
+    font-size: 1.2rem;
+    color: var(--primary);
+}
+main > form > button {
+    margin: 1rem;
+    width: 100%;
+    padding: 1rem 2rem;
+    height: 70px;
+    box-shadow: var(--shadow);
+    border-radius: 45px;
+    border: none;
+    outline: none;
+    font-size: 1.8rem;
+    font-weight: 900;
+    font-family: 'Roboto' , sans-serif;
+    background: #b3b4e8;
+    cursor: pointer;
+    color: #e4e4e4;
+    transition: .5s ease-in-out;
+}
+
+main > form > button:hover {
+    background: linear-gradient(45deg,#b3b4e8, var(--primary));
+}
