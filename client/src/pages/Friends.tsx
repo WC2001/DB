@@ -10,7 +10,7 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
     const [ inviteField, setInviteField] = useState<string>('');
     const formField = useRef<HTMLInputElement>(null);
     return (
-        <main>
+        <main className={'friends'}>
             <h1> FRIENDS </h1>
             <div className={'currentFriends'}>
                 <h2> Friends List </h2>
@@ -26,7 +26,7 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
             </div>
             <div className={'inviteFriend'}>
                 <input ref={formField} type="text" value={ inviteField } onInput={ (e)=> setInviteField(`${formField.current?.value}`)  } />
-                <button> Invite </button>
+                <button onClick={()=> alert(`Invited ${ formField.current?.value }`)}> Invite </button>
             </div>
         </main>
     )
