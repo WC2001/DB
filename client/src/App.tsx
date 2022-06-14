@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './App.css';
 import io, {Socket} from 'socket.io-client';
 
-import {Home, About, Error, Login, Register} from './pages'
+import {Home, About, Error, Login, Register, Friends} from './pages'
 
 import {
   BrowserRouter as Router,
@@ -25,6 +25,7 @@ function App() {
       { path: '/about', element: <About /> },
       { path: '/login', element:<Login />},
       { path: '/register', element:<Register />},
+      { path: '/friends', element:<Friends />},
       { path: '/',      element: <Home /> },
       { path: '*',      element: <Error /> },
   ])
