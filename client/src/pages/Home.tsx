@@ -8,11 +8,11 @@ interface HomeProps {
 
 
 export const Home : React.FC<HomeProps> = ({}) => {
-    const socket = useContext(WebsocketState);
+    const { socket } = useContext(WebsocketState);
 
     useEffect( ()=> {
         // @ts-ignore
-        socket?.emit("message", { message: 'xd' , game: 'xxx', player: 'xyz' })
+        socket?.emit("messsage", { message: 'xd' , game: 'xxx', player: 'xyz' })
         console.log(socket)
         console.log('xd')
     },[socket] )

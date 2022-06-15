@@ -8,10 +8,12 @@ interface ProviderProps {
 
 export const Provider: React.FC<ProviderProps> = ({children}) => {
     return (
-        <WebSocketProvider>
+
             <AuthProvider>
-                { children }
+                <WebSocketProvider>
+                  { children }
+                </WebSocketProvider>
             </AuthProvider>
-        </WebSocketProvider>
+
     )
 }
