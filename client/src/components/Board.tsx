@@ -7,7 +7,7 @@ interface BoardProps {
     // board:FieldElement[][]
 }
 
-export type FieldElement = {piece:PieceEnum, color:string};
+export type FieldElement = {piece:PieceEnum, color:string, state:string};
 
 
 export const Board : React.FC<BoardProps> = ({}) => {
@@ -17,12 +17,13 @@ export const Board : React.FC<BoardProps> = ({}) => {
         PieceEnum.Knight, PieceEnum.Rook ];
 
     const [ boardState, setBoardState ] = useState<FieldElement[][]>([
-        [ ...order.map( f=> ({ piece: f, color: 'black' }) ) ],
-        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'black'} ) ],
-        ...Array(4).fill( Array(8).fill( {piece: PieceEnum.Empty, color: ''} ) ),
-        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'white'} ) ],
-        [ ...order.map( f=> ({ piece: f, color: 'white' }) ) ],
+        [ ...order.map( f=> ({ piece: f, color: 'black', state:'initial' }) ) ],
+        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'black', state:'initial'} ) ],
+        ...Array(4).fill( Array(8).fill( {piece: PieceEnum.Empty, color: '', state:'initial'} ) ),
+        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'white', state:'initial'} ) ],
+        [ ...order.map( f=> ({ piece: f, color: 'white', state:'initial' }) ) ],
     ])
+
 
     return (
         <div className="board">
@@ -31,7 +32,15 @@ export const Board : React.FC<BoardProps> = ({}) => {
                     (row, rowID) => (
                         <div key={rowID} className="row">
                             {
-                                row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` } piece={field.piece} color={field.color} blackField={ (rowID+colID)%2==0 } /> ))
+                                row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` }
+                                                                    stateUpdate={(board:FieldElement[][])=>setBoardState(()=>board)}
+                                                                    piece={field.piece}
+                                                                    color={field.color}
+                                                                    blackField={ (rowID+colID)%2===0 }
+                                                                    possible = { boardState[rowID][colID].state === 'possible'}
+                                                                    board={boardState}
+                                                                    x={rowID}
+                                                                    y={colID} /> ))
                             }
                         </div>
                     )
