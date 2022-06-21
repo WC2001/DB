@@ -15,12 +15,38 @@ export const Board : React.FC<BoardProps> = ({}) => {
 
     const order = [ PieceEnum.Rook , PieceEnum.Knight, PieceEnum.Bishop, PieceEnum.King, PieceEnum.Queen, PieceEnum.Bishop,
         PieceEnum.Knight, PieceEnum.Rook ];
+    const order1 = [PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty,
+        PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty];
+    const order2 = [PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn,
+        PieceEnum.Pawn, PieceEnum.Pawn]
 
-    const [ boardState, setBoardState ] = useState<FieldElement[][]>([
+    const getKings = ()=>{
+        let wKing = {x:0,y:0};
+        let bKing = {x:0,y:0};
+        for(let i=0;i<8;i++){
+            for(let j=0;j<8;j++){
+                if(boardState[i][j].piece === PieceEnum.King){
+                    if(boardState[i][j].color === 'white'){
+                        wKing.x = i;
+                        wKing.y = j;
+                    }else{
+                        bKing.x = i;
+                        bKing.y = j;
+                    }
+                }
+            }
+        }
+        return {white_king:wKing, black_king:bKing}
+    }
+
+    let [ boardState, setBoardState ] = useState<FieldElement[][]>([
         [ ...order.map( f=> ({ piece: f, color: 'black', state:'initial' }) ) ],
-        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'black', state:'initial'} ) ],
-        ...Array(4).fill( Array(8).fill( {piece: PieceEnum.Empty, color: '', state:'initial'} ) ),
-        [ ...Array(8).fill( {piece: PieceEnum.Pawn, color: 'white', state:'initial'} ) ],
+        [ ...order2.map( f=> ({ piece: f, color: 'black', state:'initial' }) ) ],
+        [...order1.map( f=> ({ piece: f, color: '', state:'initial' }) )],
+        [...order1.map( f=> ({ piece: f, color: '', state:'initial' }) )],
+        [...order1.map( f=> ({ piece: f, color: '', state:'initial' }) )],
+        [...order1.map( f=> ({ piece: f, color: '', state:'initial' }) )],
+        [ ...order2.map( f=> ({ piece: f, color: 'white', state:'initial' }) ) ],
         [ ...order.map( f=> ({ piece: f, color: 'white', state:'initial' }) ) ],
     ])
 
@@ -39,6 +65,7 @@ export const Board : React.FC<BoardProps> = ({}) => {
                                                                     blackField={ (rowID+colID)%2===0 }
                                                                     possible = { boardState[rowID][colID].state === 'possible'}
                                                                     board={boardState}
+                                                                    kings={getKings()}
                                                                     x={rowID}
                                                                     y={colID} /> ))
                             }
