@@ -42,4 +42,10 @@ main > .board > .row > .field.dark {
     /*background: #f2eddf;*/
     background: #9a7c6e;
 }
+main > .board > .row > .selected {
+    background: rgba(135, 178, 88, 0.76) !important;
+}
+main > .board > .row > .possible {
+    background: #c98888 !important;
+}
 main > .board > .row > .field > svg { filter: drop-shadow( 10px 7px 29px rgba(100, 100, 111, 0.2))  }

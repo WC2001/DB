@@ -4,7 +4,7 @@ import {Field} from "./Field";
 import {WebsocketState} from "../shared/providers";
 
 interface BoardProps {
-    // board:FieldElement[][]
+
 }
 
 export type FieldElement = {piece:PieceEnum, color:string, state:string};
@@ -13,33 +13,18 @@ export type FieldElement = {piece:PieceEnum, color:string, state:string};
 export const Board : React.FC<BoardProps> = ({}) => {
     const socket = useContext(WebsocketState);
 
-    const order = [ PieceEnum.Rook , PieceEnum.Knight, PieceEnum.Bishop, PieceEnum.King, PieceEnum.Queen, PieceEnum.Bishop,
+    const order = [ PieceEnum.Rook , PieceEnum.Knight, PieceEnum.Bishop, PieceEnum.Queen, PieceEnum.King, PieceEnum.Bishop,
         PieceEnum.Knight, PieceEnum.Rook ];
     const order1 = [PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty,
         PieceEnum.Empty, PieceEnum.Empty, PieceEnum.Empty];
     const order2 = [PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn, PieceEnum.Pawn,
         PieceEnum.Pawn, PieceEnum.Pawn]
 
-    const getKings = ()=>{
-        let wKing = {x:0,y:0};
-        let bKing = {x:0,y:0};
-        for(let i=0;i<8;i++){
-            for(let j=0;j<8;j++){
-                if(boardState[i][j].piece === PieceEnum.King){
-                    if(boardState[i][j].color === 'white'){
-                        wKing.x = i;
-                        wKing.y = j;
-                    }else{
-                        bKing.x = i;
-                        bKing.y = j;
-                    }
-                }
-            }
-        }
-        return {white_king:wKing, black_king:bKing}
-    }
+    const [kingsPositions, setKingsPositions] = useState<{white_king:{x:number,y:number}, black_king:{x:number, y:number}}>(
+        {white_king:{x:7,y:4}, black_king:{x:0,y:4}}
+    )
 
-    let [ boardState, setBoardState ] = useState<FieldElement[][]>([
+    const [ boardState, setBoardState ] = useState<FieldElement[][]>([
         [ ...order.map( f=> ({ piece: f, color: 'black', state:'initial' }) ) ],
         [ ...order2.map( f=> ({ piece: f, color: 'black', state:'initial' }) ) ],
         [...order1.map( f=> ({ piece: f, color: '', state:'initial' }) )],
@@ -59,13 +44,12 @@ export const Board : React.FC<BoardProps> = ({}) => {
                         <div key={rowID} className="row">
                             {
                                 row.map( (field, colID) => ( <Field key={ `${rowID}-${colID}` }
-                                                                    stateUpdate={(board:FieldElement[][])=>setBoardState(()=>board)}
-                                                                    piece={field.piece}
-                                                                    color={field.color}
+                                                                    stateUpdate={(board:FieldElement[][])=>setBoardState([...board])}
                                                                     blackField={ (rowID+colID)%2===0 }
-                                                                    possible = { boardState[rowID][colID].state === 'possible'}
                                                                     board={boardState}
-                                                                    kings={getKings()}
+                                                                    kings={kingsPositions}
+                                                                    kingsUpdate={(kings:{white_king:{x:number,y:number},
+                                                                        black_king:{x:number, y:number}})=>setKingsPositions(kings)}
                                                                     x={rowID}
                                                                     y={colID} /> ))
                             }
