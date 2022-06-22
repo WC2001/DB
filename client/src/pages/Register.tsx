@@ -19,10 +19,10 @@ export const Register: React.FC<RegisterProps> = ({}) => {
             <Formik
                 initialValues={{ username: '', password: '', repeatPassword: '' }}
                 onSubmit={ async (values, {setSubmitting})=> {
-                    const res = await fetch('http://localhost:3000/user/register', {
+                    const res = await fetch('http://localhost:3001/user/register', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify( { username: values.username, password: values.password } )
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json'},
+                        body: JSON.stringify( { nick: values.username, password: values.password } )
                     });
                     const data = await res.json();
                     navigate('/login')
