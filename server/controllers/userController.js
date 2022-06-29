@@ -21,10 +21,15 @@ const login = async ( req,res ) => {
 }
 
 const addUser = async ( req,res ) => {
-    const user = new User(req.body);
-    const exists = await UserService.doesExist( user.email );
-    if ( exists ) res.send( ResponseHelper('bad', {"message": "User Exists"}) )
-    await UserService.createUser(user)
+    const user = new User(req.body.username, req.body.password);
+    const exists = await UserService.doesExist( user.username );
+    if ( exists ) res.json( {"message": "User Exists"} );
+    else{
+        await UserService.createUser(user)
+        //res.send(ResponseHelper('ok', {"message":"Registered"}));
+        res.json({"message":"Registered"});
+    }
+
 }
 
 module.exports = {

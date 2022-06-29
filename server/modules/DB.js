@@ -2,13 +2,13 @@ const mongoClient = require('mongodb').MongoClient;
 
 class DBConnection {
     static mongoClient;
-    static dbName = "Restaurant";
+    static dbName = "Chess";
     static isInitialized() {
         return this.mongoClient !== undefined;
     }
     static getClient(){
         if (this.isInitialized()) return this.mongoClient;
-        const mongoUrl = "mongodb+srv://admin:admin@cluster.an1bw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+        const mongoUrl = "mongodb+srv://admin:admin@cluster.an1bw.mongodb.net/?retryWrites=true&w=majority";
         this.mongoClient = new mongoClient(mongoUrl);
         return this.mongoClient
     }

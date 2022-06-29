@@ -1,11 +1,25 @@
 const http  = require('http');
-const path = require("path");
 const express = require("express");
 const socketio = require("socket.io");
-
-
+const userRoutes = require('./routes/user');
+const cors = require('cors');
+const bodyParser = require('body-parser');
 const app = express();
+app.use(cors(
+    {
+        origin: 'http://localhost:3000',
+    }
+));
+app.use(express.json());
+
+app.use(express.urlencoded({ extended: true }));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+
+app.use(userRoutes);
 const server = http.createServer(app);
+
 const io = socketio(server, {
     cors: {
         origin: "http://localhost:3000",
@@ -14,7 +28,7 @@ const io = socketio(server, {
         credentials: true
     }
 })
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 io.on('connection', socket =>{
 

@@ -42,7 +42,7 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
 
 
     useEffect(() => {
-        const newSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://localhost:3001`);
+        const newSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io(`http://localhost:3002`);
         setSocket(newSocket);
 
         return () => {

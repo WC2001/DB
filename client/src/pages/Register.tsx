@@ -1,6 +1,8 @@
 import React from 'react';
 import './styles/Login.css'
 import {ErrorMessage, Field, Form, Formik} from 'formik';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
     Routes,
     Route,
@@ -13,19 +15,27 @@ interface RegisterProps {
 
 export const Register: React.FC<RegisterProps> = ({}) => {
     const navigate = useNavigate();
+    const notify = (text:string) => toast(text);
     return (
         <main>
+            <ToastContainer />
             <h1> Register </h1>
             <Formik
                 initialValues={{ username: '', password: '', repeatPassword: '' }}
                 onSubmit={ async (values, {setSubmitting})=> {
-                    const res = await fetch('http://localhost:3001/user/register', {
+                    console.log(values);
+                    const res = await fetch('http://localhost:3002/user/register', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json'},
-                        body: JSON.stringify( { nick: values.username, password: values.password } )
+                        headers: { 'Content-Type': 'application/json'},
+                        body: JSON.stringify( { username: values.username, password: values.password } )
                     });
                     const data = await res.json();
-                    navigate('/login')
+                    notify(data.message);
+                    setTimeout(()=>{
+                        if(data.message === 'Registered')
+                            navigate('/login')
+                    }, 3000);
+
                 } }
             >
                 {

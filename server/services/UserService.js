@@ -8,8 +8,9 @@ class UserService {
     }
 
     static createUser = async (user) => {
+        console.log(user);
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        connection.collection.insert(user,  (err, result) => {
+        connection.collection.insertOne({username:user.username, password: user.password, friends:user.friends},  (err, result) => {
             console.log(result)
             return result
         });
@@ -17,13 +18,13 @@ class UserService {
 
     static findUser = async (user) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        return await connection.collection.find({email: user.email, password: user.password}).toArray()
+        return await connection.collection.find({nick: user.nick, password: user.password}).toArray()
     }
 
     static getFriends = async (user) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
         return connection.collection.findOne(
-            { email : user.email },
+            { nick : user.nick },
             { friends: 1 }
         )
     }
@@ -31,7 +32,7 @@ class UserService {
     static getStats = async (user) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
         connection.collection.findOne(
-            { email : user.email },
+            { nick : user.nick },
             { stats: 1 }
         )
     }
@@ -39,17 +40,17 @@ class UserService {
     static addGame = async (user, gameID) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
         connection.collection.updateOne(
-            { email: user.email },
+            { nick: user.nick },
             { $push: { games: gameID }  },
         )
     }
 
-    static doesExist = async (email) => {
+    static doesExist = async (nick) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        const user =  connection.collection.findOne(
-            { email: email }
+        const user = await connection.collection.findOne(
+            { username: nick }
         )
-        return !!user;
+        return user !== null && user !== undefined;
     }
 }
 

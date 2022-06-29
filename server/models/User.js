@@ -1,10 +1,10 @@
 const Crypto = require('../modules/Crypto')
 
 class User {
-    constructor( email, password ) {
-        this.email = email;
+    constructor( nick, password ) {
+        this.username = nick;
         this.password = Crypto.hash( password );
-        this.friends = []
+        this.friends = [];
     }
 
     comparePasswords( input ) {
