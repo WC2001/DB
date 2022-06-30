@@ -8,9 +8,11 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
     return (
         <nav>
             <div> <Link to="/"> Home </Link> </div>
-            <div> <Link to="/friends"> Friends </Link> </div>
             <div> <Link to="/about"> About </Link> </div>
+            <div> <Link to="/friends"> Friends </Link> </div>
             <div> <Link to="/login"> Log in </Link> </div>
+            <div> <Link to="/register"> Register </Link> </div>
+            <div> <Link to="/profile"> Profile </Link> </div>
             {/*<div> <Link to="/asdfe"> Error </Link> </div>*/}
         </nav>
     )

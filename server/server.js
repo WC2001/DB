@@ -5,6 +5,7 @@ const userRoutes = require('./routes/user');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const {GameService} = require("./services/GameService");
+const {UserService} = require("./services/UserService");
 const app = express();
 app.use(cors(
     {
@@ -35,6 +36,7 @@ io.on('connection', socket =>{
 
     socket.on("create_game", async (game)=>{
         await GameService.createGame(game);
+        await UserService.addGame(game.white, game.id);
         socket.join(game);
     });
 

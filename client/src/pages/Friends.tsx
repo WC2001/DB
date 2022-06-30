@@ -62,7 +62,7 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
                         <h3>{ friend.username }</h3>
                         <button onClick={ ()=> {
                            // @ts-ignore
-                            socket?.emit('create_game', `${ user?.username ?? 'user' }-${ friend.username }-${ Date.now() }` )
+                            socket?.emit('create_game', {white: user?.username ?? 'user', black: friend.username, id: `${ user?.username ?? 'user' }-${ friend.username }-${ Date.now() }`} )
                         } }> Play </button>
                     </div>
                     )

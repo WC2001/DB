@@ -9,7 +9,8 @@ class GameService {
 
     static createGame = async (game) => {
         const connection = await DBConnection.connect("Games", DBConnection.getClient());
-        const result = await connection.collection.insert(game);
+        const result = await connection.collection.insertOne({white:game.white, black:game.black, id:game.id,
+            draw:false, winner:'', moves:[]});
         return result;
     }
 
@@ -31,9 +32,15 @@ class GameService {
         return game !== null && game !== undefined;
     }
 
-    static updateBoardState = (gameId)=> {}
+    static updateBoardState = async (gameId, moves)=> {
+        const connection = await DBConnection.connect("Games", DBConnection.getClient());
+        return await connection.collection.updateMany({id: gameId}, {$set: {moves: moves}});
+    }
 
-    static endGame = (gameId) => {}
+    static endGame = async (gameId, winner, draw) => {
+        const connection = await DBConnection.connect("Games", DBConnection.getClient());
+        return await connection.collection.updateMany({id: gameId}, {$set: {winner: winner, draw:draw}});
+    }
 }
 
 

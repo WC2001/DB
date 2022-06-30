@@ -11,7 +11,7 @@ router.get('/user/xd', (req,res)=>{ res.json({m:'ok'})});
 router.get('/user/:username/friends', userController.getFriends);
 router.get('/user/:id', userController.getUser);
 router.get('/users', userController.getAllUsers);
-router.get('/users/:username/games', userController.getGames);
+router.get('/user/:username/games', userController.getGames);
 router.post('/user/add', userController.addFriend);
 router.post('/user/addGame', userController.addGame);
 router.post('/user/register', userController.addUser);
