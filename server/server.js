@@ -4,6 +4,7 @@ const socketio = require("socket.io");
 const userRoutes = require('./routes/user');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const {GameService} = require("./services/GameService");
 const app = express();
 app.use(cors(
     {
@@ -32,7 +33,8 @@ const PORT = process.env.PORT || 3002;
 
 io.on('connection', socket =>{
 
-    socket.on("create_game", (game)=>{
+    socket.on("create_game", async (game)=>{
+        await GameService.createGame(game);
         socket.join(game);
     });
 
