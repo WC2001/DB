@@ -2,6 +2,7 @@ const DBConnection = require("../modules/DB");
 const {UserService} = require("../services/UserService");
 const {ResponseHelper} = require("../helpers/response");
 const {User} = require("../models/User");
+const {GameService} = require("../services/GameService");
 
 
 const getAllUsers = async ( req, res ) => {
@@ -26,6 +27,18 @@ const getFriends = async (req, res) => {
         res.send( data ? ResponseHelper('ok', data[0].friends) : ResponseHelper('bad', []));
     }
 
+}
+
+const getGames = async (req,res)=>{
+    if(req.params.username === '' || req.params.username === '0'){
+        res.send(ResponseHelper('No user found', []));
+    }
+    else{
+        console.log(req.params.username);
+        const data = await UserService.getGames({username:req.params.username});
+        console.log(data[0].games);
+        res.send( data ? ResponseHelper('ok', data[0].games) : ResponseHelper('bad', []));
+    }
 }
 
 const login = async ( req,res ) => {
@@ -65,13 +78,26 @@ const addFriend = async (req,res) => {
     else{
         res.send({message:'User not found.'});
     }
+}
 
+const addGame = async (req, res) =>{
+    const data = req.body;
+    const exists = await GameService.doesExist( data.gameId);
+    if(exists){
+        await UserService.addGame(data.username, data.gameId);
+        res.send({message:'Added.'});
+    }
+    else{
+        res.send({message:'Game not found.'});
+    }
 }
 
 module.exports = {
+    addGame,
     addFriend,
     getUser,
     getAllUsers,
+    getGames,
     getFriends,
     login,
     addUser

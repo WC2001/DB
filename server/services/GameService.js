@@ -23,6 +23,14 @@ class GameService {
         return connection.collection.find({ id: gameId })
     }
 
+    static doesExist = async (gameId) => {
+        const connection = await DBConnection.connect("Games", DBConnection.getClient());
+        const game = await connection.collection.findOne(
+            { id: gameId }
+        )
+        return game !== null && game !== undefined;
+    }
+
     static updateBoardState = (gameId)=> {}
 
     static endGame = (gameId) => {}

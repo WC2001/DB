@@ -5,6 +5,7 @@ class User {
         this.username = nick;
         this.password = Crypto.hash( password );
         this.friends = [];
+        this.games = [];
     }
 
     comparePasswords( input ) {

@@ -11,7 +11,8 @@ class UserService {
     static createUser = async (user) => {
         console.log(user);
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        connection.collection.insertOne({username:user.username, password: user.password, friends:user.friends},  (err, result) => {
+        connection.collection.insertOne({username:user.username, password: user.password,
+            friends:user.friends, games: user.games},  (err, result) => {
             console.log(result)
             return result
         });
@@ -31,6 +32,15 @@ class UserService {
         ).toArray();
     }
 
+    static getGames = async (user) => {
+        console.log(user);
+        const connection = await DBConnection.connect("Users", DBConnection.getClient());
+        return connection.collection.find(
+            { username : user.username},
+            { games: 1, _id: 0}
+        ).toArray();
+    }
+
     static getStats = async (user) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
         connection.collection.findOne(
@@ -42,7 +52,7 @@ class UserService {
     static addGame = async (user, gameID) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
         connection.collection.updateOne(
-            { username: user.username},
+            { username: user},
             { $push: { games: gameID }  },
         )
     }
