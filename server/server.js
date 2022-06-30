@@ -40,8 +40,8 @@ io.on('connection', socket =>{
         socket.join(game);
     });
 
-    socket.on("request_game", ({ user, game })=>{
-        socket.emit("request_game", {user,game})
+    socket.on("request_game", ( data )=>{
+        socket.emit("request_game", {user:data.user, game:data.game})
     });
 
     socket.on("message", ({ message,player, game }) =>{

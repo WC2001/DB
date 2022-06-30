@@ -15,6 +15,7 @@ export type PlayerMovePayload = {
 export interface ClientToServerEvents {
     message: (payload: MessagePayload)=> void;
     create_game: (game: string)=> void;
+    request_game: (data:{user:string, game:string})=>void;
 }
 export interface ServerToClientEvents {
     message: (payload: MessagePayload)=> void;

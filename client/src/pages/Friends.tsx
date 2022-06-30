@@ -61,8 +61,17 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
                     friendList.map( friend => <div key={ friend.username }>
                         <h3>{ friend.username }</h3>
                         <button onClick={ ()=> {
+                            let gameId = `${ user?.username ?? 'user' }-${ friend.username }-${ Date.now() }`;
                            // @ts-ignore
-                            socket?.emit('create_game', {white: user?.username ?? 'user', black: friend.username, id: `${ user?.username ?? 'user' }-${ friend.username }-${ Date.now() }`} )
+
+                            socket?.emit('create_game', {white: user?.username ?? 'user',
+                                black: friend.username,
+                                id: gameId} );
+
+
+                            socket?.emit('request_game', {user:friend.username,
+                                game:gameId});
+
                         } }> Play </button>
                     </div>
                     )
