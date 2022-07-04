@@ -2,7 +2,6 @@ import React, {createContext, JSXElementConstructor, ReactElement, useContext, u
 import io, {Socket} from "socket.io-client";
 import {Board, ClientToServerEvents, ServerToClientEvents} from "../types";
 import {AuthState} from "./AuthProvider";
-import {currentGame} from "./CurrentGameProvider";
 import {useNavigate} from "react-router-dom";
 
 interface WebSocketProverProps {
@@ -20,6 +19,10 @@ export type SocketState = {
     board?: Board,
     room? : string,
     rooms? : string[]
+    currentGame?: string,
+    currentMoves: string[],
+    addMove: (move:string)=>void;
+
 };
 
 
@@ -29,7 +32,11 @@ export const WebsocketState = createContext<SocketState>({
     setMessages: ()=>{},
     setRoom: ()=> {},
     rooms: [],
-    room: ''
+    room: '',
+    currentGame:'',
+    currentMoves:[],
+    addMove:(move:string)=>{},
+
 });
 
 
@@ -39,7 +46,8 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
 
     const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>|null>(null);
     const { user } = useContext(AuthState);
-    const { currentId, init } = useContext(currentGame);
+    const [currentGame, setCurrentGame] = useState<string>('');
+    const [currentMoves, setCurrentMoves] = useState<string[]>([]);
     const [room, setRoom] = useState<string>('')
     const [rooms, setRooms] = useState<string[]>([])
     const [messages, setMessages] = useState<{message: string, username: string}[]>([])
@@ -68,20 +76,24 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     //
     //     setMessages([]);
     // });
+    const addMove = (move:string)=>{
+        currentMoves.push(move);
+        setCurrentMoves(currentMoves);
+    }
 
-    socket?.on('request_game', (data)=>{
+    socket?.off('request_game').on('request_game', (data)=>{
         console.log(data.user);
         const invitingPerson = data.game.split('-')[0];
         if(user?.username === data.user){
             if(window.confirm(`Accept invitation from ${invitingPerson}.`)){
                 socket?.emit('start_game', {user1:invitingPerson, user2:user?.username, game:data.game});
                 socket?.emit('add_to_game', {user:user?.username, game:data.game});
-                init(data.game);
+                setCurrentGame(data.game);
                 setTimeout(()=>{
 
                     navigate('/');
                 }, 2000);
-                console.log(currentId);
+                console.log(currentGame);
 
             }
             else{
@@ -94,12 +106,12 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     });
 
     socket?.on('start_game', (data)=>{
-        init(data.game);
+        setCurrentGame(data.game);
         setTimeout(()=>{
 
             navigate('/');
         }, 2000);
-        console.log(currentId);
+        console.log(currentGame);
     })
 
 
@@ -110,7 +122,10 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
             rooms,
             messages,
             setMessages,
-            setRoom
+            setRoom,
+            currentMoves,
+            currentGame,
+            addMove
         }}>
             { children }
         </WebsocketState.Provider>

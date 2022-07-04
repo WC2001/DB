@@ -11,7 +11,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {FieldElement} from "./Board";
-import {currentGame} from "../shared/providers";
 import {useStorage} from "../shared/hooks";
 
 interface FieldProps {
@@ -37,8 +36,6 @@ export const Field : React.FC<FieldProps> = ({blackField,
         ["rook", faChessRook]
     ]);
 
-    const {currentId, currentMoves, refresh} = useContext(currentGame);
-    const [moves, setMoves] = useStorage<string[]>('moves', []);
 
     const validField=(x:number, y:number)=>{
         return !(x >= 8 || y >= 8 || x < 0 || y < 0);
