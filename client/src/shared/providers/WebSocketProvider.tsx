@@ -2,6 +2,8 @@ import React, {createContext, JSXElementConstructor, ReactElement, useContext, u
 import io, {Socket} from "socket.io-client";
 import {Board, ClientToServerEvents, ServerToClientEvents} from "../types";
 import {AuthState} from "./AuthProvider";
+import {currentGame} from "./CurrentGameProvider";
+import {useNavigate} from "react-router-dom";
 
 interface WebSocketProverProps {
     children:ReactElement<any, string | JSXElementConstructor<any>>
@@ -31,14 +33,18 @@ export const WebsocketState = createContext<SocketState>({
 });
 
 
+
+
 export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) => {
 
     const [socket, setSocket] = useState<Socket<ServerToClientEvents, ClientToServerEvents>|null>(null);
     const { user } = useContext(AuthState);
+    const { currentId, init } = useContext(currentGame);
     const [room, setRoom] = useState<string>('')
     const [rooms, setRooms] = useState<string[]>([])
     const [messages, setMessages] = useState<{message: string, username: string}[]>([])
 
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -62,6 +68,39 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     //
     //     setMessages([]);
     // });
+
+    socket?.on('request_game', (data)=>{
+        console.log(data.user);
+        const invitingPerson = data.game.split('-')[0];
+        if(user?.username === data.user){
+            if(window.confirm(`Accept invitation from ${invitingPerson}.`)){
+                socket?.emit('start_game', {user1:invitingPerson, user2:user?.username, game:data.game});
+                socket?.emit('add_to_game', {user:user?.username, game:data.game});
+                init(data.game);
+                setTimeout(()=>{
+
+                    navigate('/');
+                }, 2000);
+                console.log(currentId);
+
+            }
+            else{
+                socket?.emit('cancel_game', data.game);
+                console.log('Rejected.');
+            }
+        }
+        //window.confirm(`Accept invitation from ${invitingPerson}.`);
+        //console.log('Invited.');
+    });
+
+    socket?.on('start_game', (data)=>{
+        init(data.game);
+        setTimeout(()=>{
+
+            navigate('/');
+        }, 2000);
+        console.log(currentId);
+    })
 
 
     return (

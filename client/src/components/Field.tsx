@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import {PieceEnum} from "../shared/types";
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {
@@ -11,6 +11,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {FieldElement} from "./Board";
+import {currentGame} from "../shared/providers";
+import {useStorage} from "../shared/hooks";
 
 interface FieldProps {
     blackField?: boolean;
@@ -33,7 +35,10 @@ export const Field : React.FC<FieldProps> = ({blackField,
         ["bishop", faChessBishop],
         ["knight", faChessKnight],
         ["rook", faChessRook]
-    ])
+    ]);
+
+    const {currentId, currentMoves, refresh} = useContext(currentGame);
+    const [moves, setMoves] = useStorage<string[]>('moves', []);
 
     const validField=(x:number, y:number)=>{
         return !(x >= 8 || y >= 8 || x < 0 || y < 0);

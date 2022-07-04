@@ -40,8 +40,22 @@ io.on('connection', socket =>{
         socket.join(game);
     });
 
+    socket.on("add_to_game", async (data)=>{
+        await UserService.addGame(data.user, data.game);
+    })
+
+    socket.on("cancel_game", async (game)=>{
+        await GameService.deleteGame(game);
+    })
+
+    socket.on("start_game", async (data)=>{
+        await GameService.startGame(data.game);
+        socket.broadcast.emit("start_game", {user1:data.user1, user2:data.user2, game:data.game})
+    })
+
     socket.on("request_game", ( data )=>{
-        socket.emit("request_game", {user:data.user, game:data.game})
+        console.log(data)
+        socket.broadcast.emit("request_game", {user:data.user, game:data.game})
     });
 
     socket.on("message", ({ message,player, game }) =>{

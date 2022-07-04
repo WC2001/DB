@@ -7,13 +7,16 @@ interface FriendsProps {
 
 export const Friends: React.FC<FriendsProps> = ({}) => {
     const mock = [{ username: 'Andi'}, { username: 'Kuba'}]
-    const [friendList, setFriendList] = useState<{username: string}[]>([...mock])
+    const [friendList, setFriendList] = useState<{username: string}[]>([...mock]);
+    const [userState, setUser] = useState<{username:string, password:string}>({username:'', password:''});
 
     const [ inviteField, setInviteField] = useState<string>('');
     const formField = useRef<HTMLInputElement>(null);
 
     const { socket } = useContext(WebsocketState);
+
     const { user } = useContext(AuthState);
+
 
     const addFriend = async ()=>{
         let u = user !== null ? user.username : '0';
@@ -24,9 +27,10 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
         })
         const data = await res.json();
         console.log(data.message);
+        await updateFriends(u);
     }
 
-    useEffect( () => {
+    /*useEffect( () => {
         console.log(user);
         let u = user !== null ? user.username : '0';
         const friends = async () => {
@@ -34,7 +38,7 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
             const data =  await fetch(`http://localhost:3002/user/${u}/friends`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json'},
-        });
+            });
 
             const json = await data.json();
             console.log(json);
@@ -48,7 +52,39 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
         friends()
             .catch(console.error);
 
-    }, []);
+    }, []);*/
+    const updateFriends = async (username:string) =>{
+        const data =  await fetch(`http://localhost:3002/user/${username}/friends`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json'},
+        });
+
+        const json = await data.json();
+        console.log(json);
+        let array = Array(0);
+        json.data.forEach((friend:string)=>{
+            array.push({username:friend});
+        })
+        setFriendList(array);
+    }
+
+    useEffect( ()=> {
+        ;( async()=>{
+            setUser(user!);
+            console.log(user);
+            let u = user !== null ? user.username : '0';
+            await updateFriends(u);
+        } )()
+    }, [])
+
+    useEffect( ()=> {
+        ;( async()=>{
+            setUser(user!);
+            console.log(user);
+            let u = user !== null ? user.username : '0';
+            await updateFriends(u);
+        } )()
+    }, [user])
 
 
 

@@ -1,4 +1,4 @@
-import React, {createContext, JSXElementConstructor, ReactElement, useState} from 'react';
+import React, {createContext, JSXElementConstructor, ReactElement, useEffect, useState} from 'react';
 import {User} from "../types";
 import {useStorage} from "../hooks";
 import { ToastContainer, toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import {
     Link,
     useNavigate,
 } from 'react-router-dom';
+import {json} from "stream/consumers";
 
 interface AuthProviderProps {
     children:ReactElement<any, string | JSXElementConstructor<any>>
@@ -23,6 +24,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     // const [ user, setUser ] = useState<User|null>(null);
     const notify = (text:string) => toast(text);
     const navigate = useNavigate();
+    useEffect(()=>{
+        const sessionBlob = window.sessionStorage.getItem('session');
+        if(sessionBlob){
+            setUser(JSON.parse(sessionBlob));
+        }
+    }, [])
     return (
         <AuthState.Provider value={{
             user: user,
@@ -38,11 +45,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
                 notify(json);
                 setTimeout(()=>{
 
-                    navigate('/friends')
+                    navigate('/friends');
                 }, 3000);
             },
             logout: async () => {
                 setUser(null);
+                navigate('/login');
             }
         }}>
             { children }
