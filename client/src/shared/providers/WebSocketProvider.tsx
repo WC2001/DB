@@ -19,9 +19,10 @@ export type SocketState = {
     board?: Board,
     room? : string,
     rooms? : string[]
-    currentGame?: string,
+    currentGame: string,
     currentMoves: string[],
     addMove: (move:string)=>void;
+    refreshMoves: ()=>void;
 
 };
 
@@ -36,6 +37,7 @@ export const WebsocketState = createContext<SocketState>({
     currentGame:'',
     currentMoves:[],
     addMove:(move:string)=>{},
+    refreshMoves:()=>{},
 
 });
 
@@ -79,6 +81,11 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     const addMove = (move:string)=>{
         currentMoves.push(move);
         setCurrentMoves(currentMoves);
+    }
+    const refreshMoves = async ()=>{
+        console.log('refreshing');
+        setCurrentMoves([]);
+        setCurrentGame('');
     }
 
     socket?.off('request_game').on('request_game', (data)=>{
@@ -125,7 +132,8 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
             setRoom,
             currentMoves,
             currentGame,
-            addMove
+            addMove,
+            refreshMoves,
         }}>
             { children }
         </WebsocketState.Provider>

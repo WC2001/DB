@@ -1,4 +1,4 @@
-import React, {createContext, JSXElementConstructor, ReactElement, useEffect, useState} from 'react';
+import React, {createContext, JSXElementConstructor, ReactElement, useContext, useEffect, useState} from 'react';
 import {User} from "../types";
 import {useStorage} from "../hooks";
 import { ToastContainer, toast } from 'react-toastify';
@@ -9,6 +9,7 @@ import {
     useNavigate,
 } from 'react-router-dom';
 import {json} from "stream/consumers";
+import {WebsocketState} from "./WebSocketProvider";
 
 interface AuthProviderProps {
     children:ReactElement<any, string | JSXElementConstructor<any>>
@@ -22,6 +23,7 @@ export const AuthState = createContext<{
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [ user, setUser ] = useStorage<User|null>('session', null);
     // const [ user, setUser ] = useState<User|null>(null);
+    const {refreshMoves} = useContext(WebsocketState);
     const notify = (text:string) => toast(text);
     const navigate = useNavigate();
     useEffect(()=>{
@@ -49,6 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
                 }, 3000);
             },
             logout: async () => {
+                await refreshMoves();
                 setUser(null);
                 navigate('/login');
             }

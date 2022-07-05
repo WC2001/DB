@@ -10,6 +10,12 @@ const getAllUsers = async ( req, res ) => {
     res.send(ResponseHelper('ok', users))
 }
 
+const getGame = async (req, res)=>{
+    const data = await GameService.getGameById('random-test1-1657021978447');
+    console.log(data);
+    res.send(data ? ResponseHelper('ok', data) : ResponseHelper('failure', []))
+}
+
 const getUser = async ( req,res ) => {
     const user = req.body;
     const data = UserService.findUser(user)
@@ -29,30 +35,25 @@ const getFriends = async (req, res) => {
 
 }
 
-const getGames = async (req,res)=>{
+const getGames = async (req, res)=>{
     if(req.params.username === '' || req.params.username === '0'){
         res.send(ResponseHelper('No user found', []));
     }
     else{
-        console.log(req.params.username);
-        const data = await UserService.getGames({username:req.params.username});
-        console.log(data[0].games);
-        res.send( data ? ResponseHelper('ok', data[0].games) : ResponseHelper('bad', []));
+        const data = await GameService.getAllUserGames(req.params.username);
+        console.log(data);
+        res.send(data ? ResponseHelper('ok', data) : ResponseHelper('bad', []))
     }
-}
+};
 
 const login = async ( req,res ) => {
-    //console.log(req.body);
     const user = await UserService.findUser({username:req.body.username, password:req.body.password});
-    //console.log(user);
     if (user.length === 0){
         res.send(ResponseHelper('Not registered', []));
     }
     else{
         res.send(ResponseHelper('ok', user));
     }
-    //res.send(user ? ResponseHelper('ok', user) : ResponseHelper('Not registered', []));
-
 }
 
 const addUser = async ( req,res ) => {
@@ -71,12 +72,30 @@ const addFriend = async (req,res) => {
     const data = req.body;
     console.log(data);
     const exists = await UserService.doesExist( data.friend );
-    if ( exists ){
+    if(data.user === data.friend){
+        res.send({message:'Cannot invite yourself.'});
+    }
+    else if ( exists ){
         await UserService.addFriend(data.user, data.friend);
+        await UserService.addFriend(data.friend, data.user);
         res.send({message:'Added.'});
     }
     else{
         res.send({message:'User not found.'});
+    }
+}
+
+const removeFriend = async (req, res) =>{
+    const data = req.body;
+    const exists1 = await UserService.friendExists(data.username, data.friend);
+    const exists2 = await UserService.friendExists(data.friend, data.username);
+    if (exists1 && exists2){
+        await UserService.removeFriend(data.username, data.friend);
+        await UserService.removeFriend(data.friend, data.username);
+        res.send({message:'Removed.'})
+    }
+    else{
+        res.send({message:'Friend not found.'})
     }
 }
 
@@ -100,5 +119,7 @@ module.exports = {
     getGames,
     getFriends,
     login,
-    addUser
+    addUser,
+    getGame,
+    removeFriend,
 }

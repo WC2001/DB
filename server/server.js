@@ -85,16 +85,24 @@ io.on('connection', socket =>{
             .emit("message", { player, message })
     });
 
-    socket.on("player_move", ({ player, board, game }) => {
+    /*socket.on("player_move", ({ player, board, game }) => {
         socket
             .to(game)
             .emit("player_move", { board, player, turn: 1 })
+    });*/
+    socket.on("player_move", async({moves, game})=>{
+        console.log(moves);
+        console.log(game);
+        await GameService.updateBoardState(game,moves);
+        socket.broadcast.emit("player_move", {moves:moves, game:game});
     });
 
-    socket.on("gameover", ({ winner, game })=> {
-        socket
-            .to(game)
-            .emit("player_move", { winner })
+
+
+    socket.on("game_over", async ({ game, winner, draw})=> {
+        await GameService.endGame(game, winner, draw);
+        socket.broadcast.emit("game_over", game);
+
     })
 })
 
