@@ -2,9 +2,15 @@ const DBConnection = require("../modules/DB");
 
 class GameService {
 
-    static getAllGame = async () => {
+    static getAllGames = async () => {
         const connection = await DBConnection.connect("Games", DBConnection.getClient());
         return connection.collection.find().toArray()
+    }
+
+    static getAllUserGames = async (userId)=>{
+        const connection = await DBConnection.connect("Games", DBConnection.getClient());
+        const res = connection.collection.find({$or:[ {black: userId}, {white:userId}]}).toArray();
+        return res;
     }
 
     static createGame = async (game) => {
@@ -31,7 +37,7 @@ class GameService {
 
     static getGameById = async (gameId) => {
         const connection = await DBConnection.connect("Games", DBConnection.getClient());
-        return connection.collection.find({ id: gameId })
+        return connection.collection.findOne({ id: gameId })
     }
 
     static doesExist = async (gameId) => {

@@ -9,27 +9,58 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     const { user } = useContext(AuthState);
 
     const [games, updateGames] = useState<{gameId:string}[]>([]);
+    const [userState, setUser] = useState<{username:string, password:string}>({username:'', password:''});
+    const [whiteGames, setWhiteGames] = useState<number>(0);
+    const [whiteWon, setWhiteWon] = useState<number>(0);
+    const [blackGames, setBlackGames] = useState<number>(0);
+    const [blackWon, setBlackWon] = useState<number>(0);
 
-    useEffect(()=>{
-        let u = user !== null ? user.username : '0';
+    const game = async (username:string)=>{
+        let no_white = 0;
+        let no_black = 0;
+        let white_won = 0;
+        let black_won = 0;
+        const data = await fetch(`http://localhost:3002/user/${username}/games`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json'},
+        });
+        const json = await data.json();
+        console.log(json);
+        let array = Array(0);
+        json.data.forEach((elem:{id:string, white:string, black:string, draw:boolean, winner:string,
+            started:boolean, moves:string[], _id:string})=>{
 
-        const games = async () =>{
-            const data = await fetch(`http://localhost:3002/user/${u}/games`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json'},
-            });
-            const json = await data.json();
-            console.log(json);
-            let array = Array(0);
-            json.data.forEach((id:string)=>{
-                array.push({gameId:id});
-            })
-            updateGames(array);
-        }
+            array.push({gameId:elem.id});
+            no_white = elem.white===user?.username ? no_white+1 : no_white;
+            white_won = elem.winner===user?.username && elem.white===user.username ? white_won+1 : white_won;
+            no_black = elem.black===user?.username ? no_black+1 : no_black;
+            black_won = elem.winner===user?.username && elem.black===user.username ? black_won+1 : black_won;
 
-        games()
-            .catch(console.error);
+        })
+        updateGames(array);
+        setBlackGames(no_black);
+        setWhiteGames(no_white);
+        setBlackWon(black_won);
+        setWhiteWon(white_won);
+    }
+
+    useEffect( ()=> {
+        ;( async()=>{
+            setUser(user!);
+            console.log(user);
+            let u = user !== null ? user.username : '0';
+            await game(u);
+        } )()
     }, [])
+
+    useEffect( ()=> {
+        ;( async()=>{
+            setUser(user!);
+            console.log(user);
+            let u = user !== null ? user.username : '0';
+            await game(u);
+        } )()
+    }, [user])
 
     return (
 
@@ -47,6 +78,24 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                         </div>
                     )
                 }
+            </div>
+            <div className={'stats'}>
+                <h3>Statistics</h3>
+                <div>
+                    <h4>Total games played: {whiteGames+blackGames}</h4>
+                    <h4>Total games won: {whiteWon+blackWon}</h4>
+                    <h4>Win ratio: {(((whiteWon+blackWon)*100)/(whiteGames+blackGames)).toFixed(2)}%</h4>
+                </div>
+                <div>
+                    <h4>White games: {whiteGames}</h4>
+                    <h4>White wins: {whiteWon}</h4>
+                    <h4>White win ratio: {((whiteWon*100)/whiteGames).toFixed(2)}%</h4>
+                </div>
+                <div>
+                    <h4>Black games: {blackGames}</h4>
+                    <h4>Black wins: {blackWon}</h4>
+                    <h4>Black win ratio: {((blackWon*100)/blackGames).toFixed(2)}%</h4>
+                </div>
             </div>
 
         </main>

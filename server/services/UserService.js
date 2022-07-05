@@ -72,6 +72,23 @@ class UserService {
         )
         return user !== null && user !== undefined;
     }
+
+    static friendExists = async (user, friend)=>{
+        const connection = await DBConnection.connect("Users", DBConnection.getClient());
+        const result = await connection.collection.find(
+            { id:user, friends : {$elemMatch: friend}}
+        )
+        return result !== null && result !== undefined;
+    }
+
+    static removeFriend = async (user, friend)=>{
+        console.log('u:', user)
+        console.log('f:', friend)
+        const connection = await DBConnection.connect("Users", DBConnection.getClient());
+        const result = await connection.collection.updateOne({username:user}, {$pull:{friends:friend}});
+        console.log(result);
+        return result;
+    }
 }
 
 

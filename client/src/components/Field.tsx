@@ -12,6 +12,16 @@ import {
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {FieldElement} from "./Board";
 import {useStorage} from "../shared/hooks";
+import {WebsocketState} from "../shared/providers";
+import {AuthState} from "../shared/providers/AuthProvider";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import {
+    Routes,
+    Route,
+    Link,
+    useNavigate,
+} from 'react-router-dom';
 
 interface FieldProps {
     blackField?: boolean;
@@ -21,12 +31,16 @@ interface FieldProps {
     stateUpdate: (board: FieldElement[][])=>void;
     kings:{white_king:{x:number,y:number}, black_king:{x:number, y:number}};
     kingsUpdate:(kings:{white_king:{x:number,y:number}, black_king:{x:number, y:number}})=>void;
+    turn:boolean;
+    turnUpdate:(turn:boolean)=>void;
 }
 
 export const Field : React.FC<FieldProps> = ({blackField,
                                                  board,x,y,stateUpdate,
-                                                 kings},
-                                             kingsUpdate) => {
+                                                 kings,
+                                                    kingsUpdate, turn, turnUpdate
+                                             }
+                                             ) => {
     const iconsMap = new Map<string, IconDefinition>([
         ["pawn", faChessPawn],
         ["king", faChessKing],
@@ -35,6 +49,31 @@ export const Field : React.FC<FieldProps> = ({blackField,
         ["knight", faChessKnight],
         ["rook", faChessRook]
     ]);
+
+    const navigate = useNavigate();
+    const notify = (text:string) => toast(text);
+
+    const {socket, currentGame, currentMoves, addMove, refreshMoves} = useContext(WebsocketState);
+    const {user} = useContext(AuthState);
+
+    const playerColor:string = user?.username === currentGame?.split('-')[0] ? 'white' : 'black';
+
+    const oppositeColor = (color:string)=>{
+        return color==='white'? 'black' : 'white';
+    }
+    const getOtherPlayer = ()=>{
+        let split = currentGame.split('-');
+        return user?.username === split[0] ? split[1] : split[0];
+    }
+
+    let getLabel = (field:{x:number, y:number})=>{
+        const list = playerColor === 'white' ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] :
+            ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'];
+        const row = playerColor === 'white' ? `${8-field.x}` : `${field.x+1}`;
+
+        return `${list[field.y]}${row}`;
+    };
+
 
 
     const validField=(x:number, y:number)=>{
@@ -315,9 +354,16 @@ export const Field : React.FC<FieldProps> = ({blackField,
 
     const Pawn=(board:FieldElement[][], x:number, y:number, check:boolean,kings:any)=>{
         let res = Array(0);
-
-        let step = board[x][y].color === 'white' ? -1 : 1;
-        let start = board[x][y].color ==='white' ? 6 : 1;
+        let start;
+        let step;
+        if(board[x][y].color === 'white'){
+            step = playerColor === 'white'? -1 : 1;
+            start =  playerColor === 'white' ? 6 : 1;
+        }
+        else{
+            step = playerColor === 'black' ? -1 : 1;
+            start = playerColor === 'black' ? 6 : 1;
+        }
 
         if(validField(x+step,y) && board[x+step][y].color === '' && check){
             res.push({x:x+step,y:y});
@@ -370,65 +416,77 @@ export const Field : React.FC<FieldProps> = ({blackField,
 
     const clickHandle = (board:FieldElement[][], x:number, y:number, kings:any)=>{
         console.log(kings);
-        if(board[x][y].state === 'initial'){
+        if(turn){
+            if(board[x][y].state === 'initial' && board[x][y].color === playerColor){
 
-            let toUpdate = possibleMoves(board,x,y,true,kings);
-            toUpdate.forEach((e)=>{
-                board[e.x][e.y].state = 'possible';
-            });
-            board[x][y].state = 'selected';
-            console.log(board);
-            stateUpdate(board);
-        }
-        else if(board[x][y].state === 'selected'){
-            board.forEach((row)=>{
-                row.forEach((e)=>{
-                    e.state = 'initial';
+                let toUpdate = possibleMoves(board,x,y,true,kings);
+                toUpdate.forEach((e)=>{
+                    board[e.x][e.y].state = 'possible';
+                });
+                board[x][y].state = 'selected';
+                console.log(board);
+                stateUpdate(board);
+            }
+            else if(board[x][y].state === 'selected'){
+                board.forEach((row)=>{
+                    row.forEach((e)=>{
+                        e.state = 'initial';
+                    })
                 })
-            })
-            console.log(board);
-            stateUpdate(board);
-        }
-        else if(board[x][y].state === 'possible'){
-            let toChange = {x:0, y:0};
-            for(let i=0;i<8;i++){
-                for(let j=0;j<8;j++){
-                    if(board[i][j].state === 'selected'){
-                        toChange.x = i;
-                        toChange.y = j;
+                console.log(board);
+                stateUpdate(board);
+            }
+            else if(board[x][y].state === 'possible'){
+                let toChange = {x:0, y:0};
+                for(let i=0;i<8;i++){
+                    for(let j=0;j<8;j++){
+                        if(board[i][j].state === 'selected'){
+                            toChange.x = i;
+                            toChange.y = j;
+                        }
+                        board[i][j].state = 'initial';
                     }
-                    board[i][j].state = 'initial';
                 }
-            }
-            if(board[x][y].piece === PieceEnum.King){
-                if(board[x][y].color === 'white'){
-                    kings.white_king.x = x;
-                    kings.white_king.y = y;
-                    kingsUpdate(kings);
-                }else{
-                    kings.black_king.x = x;
-                    kings.black_king.y = y;
-                    kingsUpdate(kings);
+                if(board[x][y].piece === PieceEnum.King){
+                    if(board[x][y].color === 'white'){
+                        kings.white_king.x = x;
+                        kings.white_king.y = y;
+                        kingsUpdate(kings);
+                    }else{
+                        kings.black_king.x = x;
+                        kings.black_king.y = y;
+                        kingsUpdate(kings);
+                    }
                 }
-            }
-            let color = board[toChange.x][toChange.y].color === 'white' ? 'black' : 'white';
-            board[x][y] = {piece:board[toChange.x][toChange.y].piece, color:board[toChange.x][toChange.y].color, state:'initial'};
-            board[toChange.x][toChange.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
-            console.log(board);
-            stateUpdate(board);
+                let color = board[toChange.x][toChange.y].color === 'white' ? 'black' : 'white';
+                board[x][y] = {piece:board[toChange.x][toChange.y].piece, color:board[toChange.x][toChange.y].color, state:'initial'};
+                board[toChange.x][toChange.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
 
-            if(!can_move(board,color,kings)){
-                console.log(`${color} king mated.`);
+                const label = `${getLabel({x:toChange.x,y:toChange.y})}-${getLabel({x:x,y:y})}`
+                stateUpdate(board);
+                addMove(label);
+                socket?.emit('player_move', {moves:currentMoves, game:currentGame});
+                turnUpdate(false);
+                if(!can_move(board,oppositeColor(playerColor),kings)){
+                    console.log(`${oppositeColor(playerColor)} king mated.`);
+                    socket?.emit('game_over', {game:currentGame, winner:user!.username, draw:false});
+                    refreshMoves();
+                    notify('You won.')
+                    setTimeout(()=>{
+                        navigate('/friends')
+                    }, 10000);
+                }
             }
         }
         else{
-
+            console.log('Wait for opponent\'s move.');
         }
     }
 
     return (
 
         <div className={ blackField? `field dark ${board[x][y].state}` : `field ${board[x][y].state}` }  onClick={()=>clickHandle(board,x,y,kings)}>
+            <ToastContainer/>
             {
                 // piece != PieceEnum.Empty && <FontAwesomeIcon icon={[ color==='white'? "far" : "fas", `chess-${piece}`]} />
                 board[x][y].piece !== PieceEnum.Empty && <FontAwesomeIcon color={ board[x][y].color } icon={iconsMap.get(`${board[x][y].piece}`) as IconDefinition} />

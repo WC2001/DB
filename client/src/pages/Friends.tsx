@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import './styles/Friends.css'
 import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
+import {useNavigate} from "react-router-dom";
 interface FriendsProps {
 }
 
@@ -17,6 +18,8 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
 
     const { user } = useContext(AuthState);
 
+    const navigate = useNavigate();
+
 
     const addFriend = async ()=>{
         let u = user !== null ? user.username : '0';
@@ -30,29 +33,6 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
         await updateFriends(u);
     }
 
-    /*useEffect( () => {
-        console.log(user);
-        let u = user !== null ? user.username : '0';
-        const friends = async () => {
-
-            const data =  await fetch(`http://localhost:3002/user/${u}/friends`, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json'},
-            });
-
-            const json = await data.json();
-            console.log(json);
-            let array = Array(0);
-            json.data.forEach((friend:string)=>{
-                array.push({username:friend});
-            })
-            setFriendList(array);
-        }
-
-        friends()
-            .catch(console.error);
-
-    }, []);*/
     const updateFriends = async (username:string) =>{
         const data =  await fetch(`http://localhost:3002/user/${username}/friends`, {
             method: 'GET',
@@ -109,6 +89,17 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
                                 game:gameId});
 
                         } }> Play </button>
+                        <button onClick={async ()=>{
+                            const res = await fetch('http://localhost:3002/user/remove',{
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json'},
+                                body: JSON.stringify( { username: user?.username, friend: friend.username } )
+                            })
+                            const data = await res.json();
+                            console.log(data.message);
+                            navigate('/friends');
+
+                        }}> Remove friend</button>
                     </div>
                     )
                 }
