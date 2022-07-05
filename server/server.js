@@ -7,6 +7,9 @@ const bodyParser = require('body-parser');
 const {GameService} = require("./services/GameService");
 const {UserService} = require("./services/UserService");
 const app = express();
+const redis = require('redis');
+const { createAdapter } = require("@socket.io/redis-adapter");
+
 app.use(cors(
     {
         origin: 'http://localhost:3000',
@@ -22,6 +25,7 @@ app.use(bodyParser.json());
 app.use(userRoutes);
 const server = http.createServer(app);
 
+// WEBSOCKETS SETUP
 const io = socketio(server, {
     cors: {
         origin: "http://localhost:3000",
@@ -32,8 +36,27 @@ const io = socketio(server, {
 })
 const PORT = process.env.PORT || 3002;
 
+
+// REDIS CONFIG
+// const redisClient = redis.createClient({
+//     url: 'redis://cache:6379',           // for cache if needed
+// });
+
+
+const pubClient = redis.createClient({ url: "redis://cache:6379" });
+const subClient = pubClient.duplicate();
+
+
+
+
+// WEBSOCKETS EVENTS
 io.on('connection', socket =>{
 
+    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+        io.adapter(createAdapter(pubClient, subClient));
+        // io.listen(3002);
+      }).catch(e=> console.log(e));
+      
     socket.on("create_game", async (game)=>{
         await GameService.createGame(game);
         await UserService.addGame(game.white, game.id);
