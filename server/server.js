@@ -46,17 +46,15 @@ const PORT = process.env.PORT || 3002;
 const pubClient = redis.createClient({ url: "redis://cache:6379" });
 const subClient = pubClient.duplicate();
 
-
+Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+    io.adapter(createAdapter(pubClient, subClient));
+    // io.listen(3002);
+  }).catch(e=> console.log(e));
 
 
 // WEBSOCKETS EVENTS
 io.on('connection', socket =>{
 
-    Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-        io.adapter(createAdapter(pubClient, subClient));
-        // io.listen(3002);
-      }).catch(e=> console.log(e));
-      
     socket.on("create_game", async (game)=>{
         await GameService.createGame(game);
         await UserService.addGame(game.white, game.id);
