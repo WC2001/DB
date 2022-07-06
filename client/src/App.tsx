@@ -13,6 +13,7 @@ import {
 import { Navbar } from "./components";
 import {ClientToServerEvents, ServerToClientEvents} from "./shared/types";
 import {Provider} from "./shared/providers";
+import {GameReview} from "./pages/GameReview";
 
 
 
@@ -28,6 +29,7 @@ function App() {
       { path: '/register', element:<Register />},
       { path: '/friends', element:<Friends />},
       { path: '/profile', element:<Profile />},
+      { path: '/review', element: <GameReview/>},
       { path: '/',      element: <Home /> },
       { path: '*',      element: <Error /> },
   ])

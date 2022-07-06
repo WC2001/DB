@@ -5,10 +5,9 @@ import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useNavigate,} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 
 interface BoardProps {
-
 }
 
 export type FieldElement = {piece:PieceEnum, color:string, state:string};
@@ -17,7 +16,6 @@ export type FieldElement = {piece:PieceEnum, color:string, state:string};
 export const Board : React.FC<BoardProps> = ({}) => {
     const {socket, currentGame, currentMoves, addMove, refreshMoves} = useContext(WebsocketState);
     const {user} = useContext(AuthState);
-
     const navigate = useNavigate();
     const notify = (text:string) => toast(text);
 

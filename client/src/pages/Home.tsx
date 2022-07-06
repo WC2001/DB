@@ -12,9 +12,7 @@ export const Home : React.FC<HomeProps> = ({}) => {
 
     useEffect( ()=> {
         // @ts-ignore
-        socket?.emit("messsage", { message: 'xd' , game: 'xxx', player: 'xyz' })
         console.log(socket)
-        console.log('xd')
     },[socket] )
 
     return (

@@ -1,19 +1,24 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {AuthState} from "../shared/providers/AuthProvider";
 import './styles/Profile.css'
+import {useNavigate} from 'react-router-dom';
+import {Game, WebsocketState} from "../shared/providers";
 interface ProfileProps {
 }
+
 
 export const Profile: React.FC<ProfileProps> = ({}) => {
 
     const { user } = useContext(AuthState);
-
-    const [games, updateGames] = useState<{gameId:string}[]>([]);
+    const { chooseGame, refreshChosen } = useContext(WebsocketState);
+    const [games, updateGames] = useState<Game[]>([]);
     const [userState, setUser] = useState<{username:string, password:string}>({username:'', password:''});
     const [whiteGames, setWhiteGames] = useState<number>(0);
     const [whiteWon, setWhiteWon] = useState<number>(0);
     const [blackGames, setBlackGames] = useState<number>(0);
     const [blackWon, setBlackWon] = useState<number>(0);
+
+    const navigate = useNavigate();
 
     const game = async (username:string)=>{
         let no_white = 0;
@@ -30,7 +35,8 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
         json.data.forEach((elem:{id:string, white:string, black:string, draw:boolean, winner:string,
             started:boolean, moves:string[], _id:string})=>{
 
-            array.push({gameId:elem.id});
+            array.push({_id:elem._id, id:elem.id, winner:elem.winner, draw:elem.draw,
+                moves:elem.moves, started:elem.started, white:elem.white, black:elem.black});
             no_white = elem.white===user?.username ? no_white+1 : no_white;
             white_won = elem.winner===user?.username && elem.white===user.username ? white_won+1 : white_won;
             no_black = elem.black===user?.username ? no_black+1 : no_black;
@@ -70,10 +76,11 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                 <h3>Games list</h3>
                 {
                     games.map(game =>
-                        <div key={game.gameId}>
-                            <h4>gameId: {game.gameId}</h4>
+                        <div key={game.id}>
+                            <h4>gameId: {game.id}</h4>
                             <button onClick={()=>{
-                                console.log('details');
+                                chooseGame(game);
+                                navigate('/review');
                             } }> See details </button>
                         </div>
                     )
@@ -84,17 +91,17 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
                 <div>
                     <h4>Total games played: {whiteGames+blackGames}</h4>
                     <h4>Total games won: {whiteWon+blackWon}</h4>
-                    <h4>Win ratio: {(((whiteWon+blackWon)*100)/(whiteGames+blackGames)).toFixed(2)}%</h4>
+                    <h4>Win ratio: {whiteGames+blackGames!==0 ? (((whiteWon+blackWon)*100)/(whiteGames+blackGames)).toFixed(2):0}%</h4>
                 </div>
                 <div>
                     <h4>White games: {whiteGames}</h4>
                     <h4>White wins: {whiteWon}</h4>
-                    <h4>White win ratio: {((whiteWon*100)/whiteGames).toFixed(2)}%</h4>
+                    <h4>White win ratio: {whiteGames!==0 ? ((whiteWon*100)/whiteGames).toFixed(2) : 0}%</h4>
                 </div>
                 <div>
                     <h4>Black games: {blackGames}</h4>
                     <h4>Black wins: {blackWon}</h4>
-                    <h4>Black win ratio: {((blackWon*100)/blackGames).toFixed(2)}%</h4>
+                    <h4>Black win ratio: {blackGames!==0 ? ((blackWon*100)/blackGames).toFixed(2) : 0}%</h4>
                 </div>
             </div>
 

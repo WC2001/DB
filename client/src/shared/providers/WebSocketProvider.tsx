@@ -9,6 +9,16 @@ interface WebSocketProverProps {
 }
 
 // export type SocketState = Socket<ServerToClientEvents, ClientToServerEvents> | null;
+export type Game = {
+    _id: string,
+    id: string,
+    white:string,
+    black:string,
+    winner:string,
+    draw:boolean,
+    moves:string[],
+    started:boolean
+}
 
 
 export type SocketState = {
@@ -23,7 +33,9 @@ export type SocketState = {
     currentMoves: string[],
     addMove: (move:string)=>void;
     refreshMoves: ()=>void;
-
+    chosenGame:Game,
+    chooseGame: (game:Game)=>void
+    refreshChosen:()=>void
 };
 
 
@@ -38,6 +50,9 @@ export const WebsocketState = createContext<SocketState>({
     currentMoves:[],
     addMove:(move:string)=>{},
     refreshMoves:()=>{},
+    chosenGame:{_id:'', id:'', winner:'', draw:false, moves:[], started:false, white:'', black:''},
+    chooseGame: (game:Game)=>{},
+    refreshChosen: ()=> {},
 
 });
 
@@ -53,6 +68,8 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     const [room, setRoom] = useState<string>('')
     const [rooms, setRooms] = useState<string[]>([])
     const [messages, setMessages] = useState<{message: string, username: string}[]>([])
+    const [chosenGame, setChosenGame] = useState<Game>({_id:'', id:'', white:'', black:'', winner:'',
+        started:false, draw:false, moves:[]});
 
     const navigate = useNavigate();
 
@@ -78,6 +95,15 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     //
     //     setMessages([]);
     // });
+    const chooseGame = (game:Game)=>{
+        setChosenGame(game);
+        navigate('/review');
+    }
+    const refreshChosen = () =>{
+        setChosenGame({_id:'', id:'', winner:'', draw:false, moves:[], started:false, white:'', black:''});
+        navigate('/profile');
+    }
+
     const addMove = (move:string)=>{
         currentMoves.push(move);
         setCurrentMoves(currentMoves);
@@ -132,8 +158,11 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
             setRoom,
             currentMoves,
             currentGame,
+            chosenGame,
             addMove,
             refreshMoves,
+            refreshChosen,
+            chooseGame,
         }}>
             { children }
         </WebsocketState.Provider>
