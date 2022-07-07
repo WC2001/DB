@@ -46,6 +46,19 @@ const getGames = async (req, res)=>{
     }
 };
 
+const getWins = async (req, res) =>{
+    const data = await UserService.getStats();
+    console.log(data);
+    let leaderBoard = Array(0);
+    data.forEach((user)=> {
+        leaderBoard.push({username: user.username, games: user.games.length,
+            winrate: user.games.length>0? ((user.wins.count*100)/user.games.length).toFixed(2) : 0})
+    });
+    leaderBoard.sort((user1,user2)=> (user2.winrate - user1.winrate || user2.games - user1.games ))
+    const top10 = leaderBoard.slice(0, 10);
+    res.send(ResponseHelper('ok', top10));
+};
+
 const login = async ( req,res ) => {
     const user = await UserService.findUser({username:req.body.username, password:req.body.password});
     if (user.length === 0){
@@ -122,4 +135,5 @@ module.exports = {
     addUser,
     getGame,
     removeFriend,
+    getWins
 }

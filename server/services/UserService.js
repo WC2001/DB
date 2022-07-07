@@ -20,7 +20,7 @@ class UserService {
 
     static findUser = async (user) => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        return await connection.collection.find({username: user.username, password: Crypto.hash(user.password)}).toArray()
+        return connection.collection.find({username: user.username, password: Crypto.hash(user.password)}).toArray()
     }
 
     static getFriends = async (user) => {
@@ -41,12 +41,24 @@ class UserService {
         ).toArray();
     }
 
-    static getStats = async (user) => {
+    static getStats = async () => {
         const connection = await DBConnection.connect("Users", DBConnection.getClient());
-        connection.collection.findOne(
-            { nick : user.username },
-            { stats: 1 }
-        )
+        return connection.collection.aggregate([
+            {
+                $lookup: {
+                    from: "Games",
+                    let: { user: "$username" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: [ "$$user", "$winner" ] } } },
+                        { $count: "count" }
+                    ],
+                    as: "wins"
+                }
+            },
+            {
+                $unwind: "$wins"
+            }
+        ]).toArray()
     }
 
     static addGame = async (user, gameID) => {

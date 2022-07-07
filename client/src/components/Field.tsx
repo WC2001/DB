@@ -11,15 +11,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {FieldElement} from "./Board";
-import {useStorage} from "../shared/hooks";
 import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
-    Routes,
-    Route,
-    Link,
     useNavigate,
 } from 'react-router-dom';
 

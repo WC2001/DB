@@ -48,6 +48,10 @@ nav > div {
   font-weight: 900;
 }
 
+nav > .current {
+  border-bottom: 3px solid var(--field-color);
+}
+
 nav > div:hover {
   background: #0000003d;
 }

@@ -1,19 +1,17 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './App.css';
-import io, {Socket} from 'socket.io-client';
 
 import {Home, About, Error, Login, Register, Friends, Profile} from './pages'
 
 import {
   BrowserRouter as Router,
   Routes,
-  Route,
-  Link
+  Route
 } from "react-router-dom";
 import { Navbar } from "./components";
-import {ClientToServerEvents, ServerToClientEvents} from "./shared/types";
 import {Provider} from "./shared/providers";
 import {GameReview} from "./pages/GameReview";
+import {Ranking} from "./pages/Ranking";
 
 
 
@@ -30,7 +28,9 @@ function App() {
       { path: '/friends', element:<Friends />},
       { path: '/profile', element:<Profile />},
       { path: '/review', element: <GameReview/>},
-      { path: '/',      element: <Home /> },
+      { path: '/game', element: <Home />},
+      { path: '/ranking', element: <Ranking/>},
+      { path: '/',      element: <About /> },
       { path: '*',      element: <Error /> },
   ])
 

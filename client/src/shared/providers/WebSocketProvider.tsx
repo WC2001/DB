@@ -124,7 +124,7 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
                 setCurrentGame(data.game);
                 setTimeout(()=>{
 
-                    navigate('/');
+                    navigate('/game');
                 }, 2000);
                 console.log(currentGame);
 
@@ -142,7 +142,7 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
         setCurrentGame(data.game);
         setTimeout(()=>{
 
-            navigate('/');
+            navigate('/game');
         }, 2000);
         console.log(currentGame);
     })

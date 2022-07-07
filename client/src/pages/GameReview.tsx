@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from "react";
+import React from "react";
 import './styles/Review.css'
 import {ReviewBoard} from "../components/ReviewBoard";
 

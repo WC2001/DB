@@ -1,14 +1,10 @@
-import React, {createContext, JSXElementConstructor, ReactElement, useContext, useEffect, useState} from 'react';
+import React, {createContext, JSXElementConstructor, ReactElement, useContext, useEffect} from 'react';
 import {User} from "../types";
 import {useStorage} from "../hooks";
 import { ToastContainer, toast } from 'react-toastify';
 import {
-    Routes,
-    Route,
-    Link,
     useNavigate,
 } from 'react-router-dom';
-import {json} from "stream/consumers";
 import {WebsocketState} from "./WebSocketProvider";
 
 interface AuthProviderProps {
@@ -22,7 +18,6 @@ export const AuthState = createContext<{
 }>({ user: null, login: ()=> {}, logout: ()=> {} });
 export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     const [ user, setUser ] = useStorage<User|null>('session', null);
-    // const [ user, setUser ] = useState<User|null>(null);
     const {refreshMoves} = useContext(WebsocketState);
     const notify = (text:string) => toast(text);
     const navigate = useNavigate();

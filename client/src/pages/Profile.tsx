@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {AuthState} from "../shared/providers/AuthProvider";
 import './styles/Profile.css'
 import {useNavigate} from 'react-router-dom';
@@ -10,7 +10,7 @@ interface ProfileProps {
 export const Profile: React.FC<ProfileProps> = ({}) => {
 
     const { user } = useContext(AuthState);
-    const { chooseGame, refreshChosen } = useContext(WebsocketState);
+    const { chooseGame } = useContext(WebsocketState);
     const [games, updateGames] = useState<Game[]>([]);
     const [userState, setUser] = useState<{username:string, password:string}>({username:'', password:''});
     const [whiteGames, setWhiteGames] = useState<number>(0);

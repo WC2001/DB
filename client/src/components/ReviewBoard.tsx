@@ -1,11 +1,9 @@
-import React, {useContext, useMemo, useState} from "react";
+import React, {useContext, useState} from "react";
 import {PieceEnum} from "../shared/types";
-import {Field} from "./Field";
 import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
 import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {useNavigate} from 'react-router-dom';
 import {FieldElement} from "./Board";
 import {ReviewField} from "./ReviewField";
 
@@ -55,7 +53,6 @@ export const ReviewBoard: React.FC<ReviewBoardProps> = ({}) => {
 
     const {user} = useContext(AuthState);
     const {chosenGame, refreshChosen} = useContext(WebsocketState);
-    const navigate = useNavigate();
     const playerColor = chosenGame.white === user?.username ? 'white' : 'black';
 
     console.log('review:', chosenGame);
