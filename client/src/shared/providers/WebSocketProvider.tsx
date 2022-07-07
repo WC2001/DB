@@ -139,12 +139,16 @@ export const WebSocketProvider: React.FC<WebSocketProverProps> = ({children}) =>
     });
 
     socket?.on('start_game', (data)=>{
-        setCurrentGame(data.game);
-        setTimeout(()=>{
+        let split = data.game.split('-');
+        if(user?.username === split[0] || user?.username === split[1]){
+            setCurrentGame(data.game);
+            setTimeout(()=>{
 
-            navigate('/game');
-        }, 2000);
-        console.log(currentGame);
+                navigate('/game');
+            }, 2000);
+            console.log(currentGame);
+        }
+
     })
 
 

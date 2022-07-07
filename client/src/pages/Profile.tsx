@@ -71,9 +71,9 @@ export const Profile: React.FC<ProfileProps> = ({}) => {
     return (
 
         <main className={'profile'}>
-            <h2> Games History </h2>
+            <h2> {user?.username} Game History </h2>
             <div className={'games-history'}>
-                <h3>Games list</h3>
+                <h3>Game list</h3>
                 {
                     games.map(game =>
                         <div key={game.id}>

@@ -17,6 +17,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
             {user ? null : <div className={window.location.pathname === "/login"? "current" : ""}> <Link to={window.location.pathname !== "/game" ? "/login" : "#"}> Log in </Link> </div>}
             {user ? null : <div className={window.location.pathname === "/register"? "current" : ""}> <Link to={window.location.pathname !== "/game" ? "/register" : "#"}> Register </Link> </div>}
             {user ? <div className={window.location.pathname === "/profile"? "current" : ""}> <Link to={window.location.pathname !== "/game" ? "/profile" : "#"}> Profile </Link> </div> : null}
+            {user ? <div>{user?.username}</div> : null}
             {user ? <div onClick={window.location.pathname !== "/game" ? logout : ()=>{}}>Log out</div> : null}
             {/*<div> <Link to="/asdfe"> Error </Link> </div>*/}
         </nav>

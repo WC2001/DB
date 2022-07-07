@@ -6,8 +6,6 @@ interface RankingProps {
 export const Ranking: React.FC<RankingProps> = ({}) => {
     const [top10, setTop10] = useState<{username:string, games:number, winrate:string}[]>([]);
     const place = ['first', 'second', 'third', ''];
-
-    console.log(window.location.pathname);
     const updateTop10 = async ()=>{
         const data = await fetch(`http://localhost:3002/userStats`, {
             method: 'GET',

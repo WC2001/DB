@@ -7,8 +7,8 @@ interface FriendsProps {
 }
 
 export const Friends: React.FC<FriendsProps> = ({}) => {
-    const mock = [{ username: 'Andi'}, { username: 'Kuba'}]
-    const [friendList, setFriendList] = useState<{username: string}[]>([...mock]);
+
+    const [friendList, setFriendList] = useState<{username: string}[]>([]);
     const [userState, setUser] = useState<{username:string, password:string}>({username:'', password:''});
 
     const [ inviteField, setInviteField] = useState<string>('');
@@ -72,7 +72,7 @@ export const Friends: React.FC<FriendsProps> = ({}) => {
         <main className={'friends'} >
             <h1> FRIENDS </h1>
             <div className={'currentFriends'}>
-                <h2> Friends List </h2>
+                <h2> {user?.username} friend List </h2>
                 {
                     friendList.map( friend => <div key={ friend.username }>
                         <h3>{ friend.username }</h3>
