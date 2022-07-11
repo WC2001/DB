@@ -2,7 +2,7 @@ import React, {useContext, useState} from "react";
 import {PieceEnum} from "../shared/types";
 import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
-import {toast, ToastContainer} from 'react-toastify';
+import {ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {FieldElement} from "./Board";
 import {ReviewField} from "./ReviewField";
@@ -12,15 +12,32 @@ interface ReviewBoardProps {
 
 class BoardReview{
     boardArray: FieldElement[][][];
+    color:string;
+    kingsPositions:{white_king:{x:number, y:number}, black_king:{x:number,y:number}}
+    size:number;
 
     constructor(moves:string[], color:string, initial:FieldElement[][]) {
         this.boardArray = [];
         this.boardArray.push(initial);
+        this.size = 1;
+        this.color = color;
+        this.kingsPositions = this.color === 'white' ? {white_king:{x:7,y:4}, black_king:{x:0,y:4}}
+            : {white_king:{x:0,y:4}, black_king:{x:7,y:4}};
         moves.forEach((move)=>{
             let split = move.split('-');
-            this.move({x:this.getLabel(split[0], color).x, y:this.getLabel(split[0], color).y},
-                {x:this.getLabel(split[1], color).x, y:this.getLabel(split[1], color).y},
-                [...this.boardArray[this.boardArray.length-1]]);
+            if(split[0] === '0'){
+                if(split.length === 3){
+                    this.performLongCastle([...this.boardArray[this.boardArray.length-1]]);
+                }
+                else
+                    this.performShortCastle([...this.boardArray[this.boardArray.length-1]]);
+            }
+            else{
+                this.move({x:this.getLabel(split[0], color).x, y:this.getLabel(split[0], color).y},
+                    {x:this.getLabel(split[1], color).x, y:this.getLabel(split[1], color).y},
+                    [...this.boardArray[this.boardArray.length-1]]);
+            }
+
         })
     }
 
@@ -42,9 +59,44 @@ class BoardReview{
         let board = last.map((row)=>row.slice());
         let piece:PieceEnum = board[from.x][from.y].piece;
         const color:string = board[from.x][from.y].color;
+        if(piece === PieceEnum.King && color === 'white'){
+            this.kingsPositions.white_king.x = to.x;
+            this.kingsPositions.white_king.y = to.y;
+        }
+        if(piece === PieceEnum.King && color === 'black'){
+            this.kingsPositions.black_king.x = to.x;
+            this.kingsPositions.black_king.y = to.y;
+        }
         board[to.x][to.y] = {piece:piece, color:color, state:'initial'};
         board[from.x][from.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
         this.boardArray.push(board);
+        this.size += 1;
+    }
+
+    performShortCastle(last: FieldElement[][]){
+        let direction = this.color === 'white' ? 1 : -1;
+
+        let position = (this.size % 2) ? {x:this.kingsPositions.white_king.x, y:this.kingsPositions.white_king.y}
+            : {x:this.kingsPositions.black_king.x, y:this.kingsPositions.black_king.y};
+        let board = last.map((row)=>row.slice());
+        board[position.x][position.y+3*direction] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+        board[position.x][position.y+direction] = {piece:PieceEnum.Rook, color: (this.size % 2) ? 'white' : 'black', state:'initial'}
+        board[position.x][position.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+        board[position.x][position.y+2*direction] = {piece:PieceEnum.King, color:(this.size % 2) ? 'white' : 'black', state:'initial'}
+        this.boardArray.push(board);
+        this.size += 1;
+    }
+    performLongCastle(last: FieldElement[][]){
+        let direction = this.color === 'white' ? -1 : 1;
+        let position = (this.size%2) ? {x:this.kingsPositions.white_king.x, y:this.kingsPositions.white_king.y}
+            : {x:this.kingsPositions.black_king.x, y:this.kingsPositions.black_king.y};
+        let board = last.map((row)=>row.slice());
+        board[position.x][position.y+4*direction] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+        board[position.x][position.y+direction] = {piece:PieceEnum.Rook, color: (this.size % 2) ? 'white' : 'black', state:'initial'}
+        board[position.x][position.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+        board[position.x][position.y+2*direction] = {piece:PieceEnum.King, color: (this.size % 2) ? 'white' : 'black', state:'initial'}
+        this.boardArray.push(board);
+        this.size += 1;
     }
 
 }
