@@ -22,7 +22,7 @@ class BoardReview{
         this.size = 1;
         this.color = color;
         this.kingsPositions = this.color === 'white' ? {white_king:{x:7,y:4}, black_king:{x:0,y:4}}
-            : {white_king:{x:0,y:4}, black_king:{x:7,y:4}};
+            : {white_king:{x:0,y:3}, black_king:{x:7,y:3}};
         moves.forEach((move)=>{
             let split = move.split('-');
             if(split[0] === '0'){
