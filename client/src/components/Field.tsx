@@ -13,11 +13,9 @@ import {IconDefinition} from "@fortawesome/fontawesome-svg-core";
 import {FieldElement} from "./Board";
 import {WebsocketState} from "../shared/providers";
 import {AuthState} from "../shared/providers/AuthProvider";
-import { ToastContainer, toast } from 'react-toastify';
+import {toast, ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import {
-    useNavigate,
-} from 'react-router-dom';
+import {useNavigate,} from 'react-router-dom';
 
 interface FieldProps {
     blackField?: boolean;
@@ -29,12 +27,15 @@ interface FieldProps {
     kingsUpdate:(kings:{white_king:{x:number,y:number}, black_king:{x:number, y:number}})=>void;
     turn:boolean;
     turnUpdate:(turn:boolean)=>void;
+    intact: {king:boolean, long:boolean, short:boolean};
+    intactUpdate:(intact:{king:boolean,long:boolean, short:boolean})=>void;
 }
 
 export const Field : React.FC<FieldProps> = ({blackField,
                                                  board,x,y,stateUpdate,
                                                  kings,
-                                                    kingsUpdate, turn, turnUpdate
+                                                    kingsUpdate, turn, turnUpdate,
+                                                intact, intactUpdate
                                              }
                                              ) => {
     const iconsMap = new Map<string, IconDefinition>([
@@ -62,12 +63,17 @@ export const Field : React.FC<FieldProps> = ({blackField,
         return user?.username === split[0] ? split[1] : split[0];
     }
 
-    let getLabel = (field:{x:number, y:number})=>{
+    let getLabel = (from:{x:number, y:number}, to:{x:number, y:number}, castle:string)=>{
         const list = playerColor === 'white' ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] :
             ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'];
-        const row = playerColor === 'white' ? `${8-field.x}` : `${field.x+1}`;
+        const row1 = playerColor === 'white' ? `${8-from.x}` : `${from.x+1}`;
+        const row2 = playerColor === 'white' ? `${8-to.x}` : `${to.x+1}`;
+        if(castle === 'long')
+            return '0-0-0'
+        if(castle === 'short')
+            return '0-0'
 
-        return `${list[field.y]}${row}`;
+        return `${list[from.y]}${row1}-${list[to.y]}${row2}`;
     };
 
 
@@ -342,6 +348,24 @@ export const Field : React.FC<FieldProps> = ({blackField,
             }
             console.log("e: ",empty);
         }
+        if(check){
+            if(intact.king && intact.short){
+                let direction = board[x][y].color === 'white' ? 1 : -1;
+                if(board[x][y+direction].color ==='' && board[x][y+2*direction].color ==='' &&
+                    testKing(x,y,x,y+direction,board,kings) && testKing(x,y,x,y+2*direction,board,kings)){
+                    empty.push({x:x, y:y+2*direction})
+
+                }
+            }
+            if(intact.king && intact.long){
+                let direction = board[x][y].color === 'white' ? -1 : 1;
+                if(board[x][y+direction].color ==='' && board[x][y+2*direction].color ===''
+                && board[x][y+3*direction].color ==='' && testKing(x,y,x,y+direction,board,kings)
+                    && testKing(x,y,x,y+2*direction,board,kings)){
+                    empty.push({x:x, y:y+2*direction})
+                }
+            }
+        }
         return check ? empty : res;
     }
     const Queen=(board:FieldElement[][], x:number, y:number, check:boolean, kings:any)=>{
@@ -434,6 +458,7 @@ export const Field : React.FC<FieldProps> = ({blackField,
             }
             else if(board[x][y].state === 'possible'){
                 let toChange = {x:0, y:0};
+                let castle = '';
                 for(let i=0;i<8;i++){
                     for(let j=0;j<8;j++){
                         if(board[i][j].state === 'selected'){
@@ -443,8 +468,9 @@ export const Field : React.FC<FieldProps> = ({blackField,
                         board[i][j].state = 'initial';
                     }
                 }
-                if(board[x][y].piece === PieceEnum.King){
-                    if(board[x][y].color === 'white'){
+                if(board[toChange.x][toChange.y].piece === PieceEnum.King){
+                    intactUpdate({king:false, long:intact.long, short:intact.short})
+                    if(board[toChange.x][toChange.y].color === 'white'){
                         kings.white_king.x = x;
                         kings.white_king.y = y;
                         kingsUpdate(kings);
@@ -454,11 +480,46 @@ export const Field : React.FC<FieldProps> = ({blackField,
                         kingsUpdate(kings);
                     }
                 }
+                if(board[toChange.x][toChange.y].piece === PieceEnum.Rook){
+                    let toCheck = board[toChange.x][toChange.y].color === 'white' ? [{x:7,y:7}, {x:7,y:0}] : [{x:7,y:0}, {x:7,y:7}];
+                    if(x === toCheck[0].x && y === toCheck[0].y){
+                        intactUpdate({king:intact.king, short:false, long:intact.long})
+                    }
+                    if(x === toCheck[1].x && y === toCheck[1].y){
+                        intactUpdate({king:intact.king, long:false, short:intact.short})
+                    }
+                }
                 let color = board[toChange.x][toChange.y].color === 'white' ? 'black' : 'white';
                 board[x][y] = {piece:board[toChange.x][toChange.y].piece, color:board[toChange.x][toChange.y].color, state:'initial'};
                 board[toChange.x][toChange.y] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+                if(board[x][y].piece === PieceEnum.King && Math.abs(y - toChange.y) === 2){
+                    if(board[x][y].color === 'white'){
+                        if(toChange.y < y){
+                            castle = 'short';
+                            board[x][y-1] = {piece:PieceEnum.Rook, color:'white', state:'initial'};
+                            board[x][y+1] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+                        }
+                        else{
+                            castle = 'long';
+                            board[x][y+1] = {piece:PieceEnum.Rook, color:'white', state:'initial'};
+                            board[x][y-2] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+                        }
+                    }
+                    else{
+                        if(toChange.y < y){
+                            castle = 'long';
+                            board[x][y-1] = {piece:PieceEnum.Rook, color:'black', state:'initial'};
+                            board[x][y+2] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+                        }
+                        else {
+                            castle = 'short';
+                            board[x][y+1] = {piece:PieceEnum.Rook, color:'black', state:'initial'};
+                            board[x][y-1] = {piece:PieceEnum.Empty, color:'', state:'initial'};
+                        }
+                    }
+                }
 
-                const label = `${getLabel({x:toChange.x,y:toChange.y})}-${getLabel({x:x,y:y})}`
+                const label = getLabel({x:toChange.x, y:toChange.y}, {x:x, y:y}, castle);
                 stateUpdate(board);
                 addMove(label);
                 socket?.emit('player_move', {moves:currentMoves, game:currentGame});

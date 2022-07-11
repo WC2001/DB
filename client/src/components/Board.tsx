@@ -39,23 +39,48 @@ export const Board : React.FC<BoardProps> = ({}) => {
         {white_king:{x:7,y:4}, black_king:{x:0,y:4}} :
         {white_king:{x:0,y:3}, black_king:{x:7,y:3}}
     )
+    const [intact, setIntact] = useState<{king:boolean, long:boolean, short:boolean }>({king:true, long:true, short:true})
     const [turn, setTurn] = useState<boolean>(playerColor === 'white');
 
     const oppositeColor = (color:string) :string=> {
         return color==='white' ? 'black' : 'white';
     }
 
+    const performShortCastle = () :void=>{
+        let direction = oppositeColor(playerColor) === 'white' ? -1 : 1;
+        let position = oppositeColor(playerColor) === 'white' ? {x:kingsPositions.white_king.x, y:kingsPositions.white_king.y}
+            : {x:kingsPositions.black_king.x, y:kingsPositions.black_king.y};
+        move({x:position.x, y:position.y+3*direction}, {x:position.x, y:position.y+direction});
+        move({x:position.x, y:position.y}, {x:position.x, y:position.y+2*direction});
+    }
+    const performLongCastle = ():void=>{
+        let direction = oppositeColor(playerColor) === 'white' ? 1 : -1;
+        let position = oppositeColor(playerColor) === 'white' ? {x:kingsPositions.white_king.x, y:kingsPositions.white_king.y}
+            : {x:kingsPositions.black_king.x, y:kingsPositions.black_king.y};
+        move({x:position.x, y:position.y+4*direction}, {x:position.x, y:position.y+direction});
+        move({x:position.x, y:position.y}, {x:position.x, y:position.y+2*direction});
+    }
+
     socket?.off('player_move').on('player_move', ({moves, game})=>{
         if(currentGame === game){
             addMove(moves[moves.length - 1]);
             let split = moves[moves.length-1].split('-');
-            let field1 = getField(split[0]);
-            let field2 = getField(split[1]);
-            console.log(moves);
-            console.log('field1:', field1);
-            console.log('field2:', field2);
-            console.log('move');
-            move({x:field1.x,y:field1.y}, {x:field2.x, y:field2.y});
+            if(split[0] === '0'){
+                if(split.length === 2){
+                    performShortCastle();
+                }
+                else
+                    performLongCastle();
+            }
+            else{
+                let field1 = getField(split[0]);
+                let field2 = getField(split[1]);
+                console.log(moves);
+                console.log('field1:', field1);
+                console.log('field2:', field2);
+                console.log('move');
+                move({x:field1.x,y:field1.y}, {x:field2.x, y:field2.y});
+            }
             setTurn(true);
 
         }
@@ -130,6 +155,8 @@ export const Board : React.FC<BoardProps> = ({}) => {
                                                                     turnUpdate={(turn:boolean)=>setTurn(turn)}
                                                                     kingsUpdate={(kings:{white_king:{x:number,y:number},
                                                                         black_king:{x:number, y:number}})=>setKingsPositions(kings)}
+                                                                    intact={intact}
+                                                                    intactUpdate={(intact:{king:boolean,long:boolean,short:boolean})=>setIntact(intact)}
                                                                     x={rowID}
                                                                     y={colID} /> ))
                             }
