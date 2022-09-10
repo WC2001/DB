@@ -1,6 +1,6 @@
 # DB Class Final Project
 ### AGH 2022
-
+### Author Wiktor Cieślikiewicz
 
 #### To run execute command in main directory
 ```sh
